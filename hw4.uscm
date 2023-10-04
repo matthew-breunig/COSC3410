@@ -1,1 +1,10 @@
-(val h (+ 10 12))
+(use tree-manual.uscm)
+
+(define path (n t)
+	(if 
+	 (not (tree? t)) 'error
+	 (if (tree-null? t) #f
+	  (if (= n (tree-datum t)) #t
+	   (if (< n (tree-datum t))( (tree-search n (tree-left t)) (print 'left))
+		((tree-search n (tree-right t))(print 'right))))))) 
+
