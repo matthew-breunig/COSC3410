@@ -1,10 +1,28 @@
 (use tree-manual.uscm)
 
-(define path (n t)
-	(if 
-	 (not (tree? t)) 'error
-	 (if (tree-null? t) #f
-	  (if (= n (tree-datum t)) #t
-	   (if (< n (tree-datum t))( (tree-search n (tree-left t)) (print 'left))
-		((tree-search n (tree-right t))(print 'right))))))) 
+(val list '())
 
+(define path (n t)
+    (begin
+	 (if 
+	  (not (tree? t)) 'error
+	  (if (not (tree-search n t)) #f
+	   (if (= n (tree-datum t)) 
+        (println list)
+	    (if (< n (tree-datum t))
+         (begin 
+          (path n (tree-left t))
+          (set list (cons 'left list))
+         )
+         (begin
+          (path n (tree-right t))
+          (set list (cons 'right list))
+         ) 
+        ) 
+	   )
+      )
+     )
+    )
+)
+
+(path 12 (tree-add 12 (tree-add 11 (tree-add 15 (tree-add 9 (tree-add 8 (tree-add 2 (tree-add 1 (tree-add 5 (tree-add 3 (tree-add 7 (tree-make-null))))))))))))
