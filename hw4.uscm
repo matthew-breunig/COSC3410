@@ -37,6 +37,8 @@
 
     (begin
 
+        (set exploded '())
+
         (while (>= n 1)
             (begin
                 
@@ -52,3 +54,4 @@
 )
 
 (explode-digits 123456789)
+(explode-digits 2468)
