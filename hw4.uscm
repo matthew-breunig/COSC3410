@@ -8,7 +8,10 @@
 	  (not (tree? t)) 'error
 	  (if (not (tree-search n t)) #f
 	   (if (= n (tree-datum t)) 
-        (println list)
+        (begin
+         (println list)
+         (set list '())
+        )
 	    (if (< n (tree-datum t))
          (begin 
           (path n (tree-left t))
@@ -26,3 +29,4 @@
 )
 
 (path 12 (tree-add 12 (tree-add 11 (tree-add 15 (tree-add 9 (tree-add 8 (tree-add 2 (tree-add 1 (tree-add 5 (tree-add 3 (tree-add 7 (tree-make-null))))))))))))
+(path 2 (tree-add 12 (tree-add 11 (tree-add 15 (tree-add 9 (tree-add 8 (tree-add 2 (tree-add 1 (tree-add 5 (tree-add 3 (tree-add 7 (tree-make-null))))))))))))
