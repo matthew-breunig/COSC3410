@@ -55,3 +55,47 @@
 
 (explode-digits 123456789)
 (explode-digits 2468)
+
+(val imploded 1)
+(val j 0)
+(val counter 1)
+
+(define implode-digits (n)
+
+    (begin
+
+        (set imploded 1)
+        (set j 0)
+        (set counter 1)
+
+        (while (not (null? (cdr n)))
+            (begin
+                (set imploded (* imploded 10))
+                (set imploded (+ imploded (car n)))
+                (set n (cdr n))
+                (set j (+ j 1))
+
+            )
+        )
+
+        (set imploded (* imploded 10))
+        (set imploded (+ imploded (car n)))
+
+        (while (> j -1)
+            (begin
+
+                (set counter (* counter 10))
+            
+                (set j (- j 1))
+
+            )
+        )
+
+        (set imploded (- imploded counter))
+        (println imploded)
+
+    )
+)
+
+(implode-digits '(1 2 3 4))
+(implode-digits '(2 4 6 8))
