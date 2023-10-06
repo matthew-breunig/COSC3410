@@ -99,3 +99,95 @@
 
 (implode-digits '(1 2 3 4))
 (implode-digits '(2 4 6 8))
+
+(val sum 0)
+
+(define dot-product (l1 l2)
+
+    (begin
+    
+        (set sum 0)
+
+        (while (not (null? (cdr l1)))
+
+            (begin
+
+                (set sum (+ sum (* (car l1) (car l2) )))
+
+                (set l1 (cdr l1))
+
+                (set l2 (cdr l2))
+
+            )
+        )
+
+        (set sum (+ sum (* (car l1) (car l2) )))
+
+        (println sum)
+
+    )
+)
+
+(dot-product '(1 2 3) '(2 3))
+(dot-product '(1 2 3) '(2 3 4))
+
+(define count (key list)
+
+    (begin
+
+        (set sum 0)
+    
+        (while (not (null? (cdr list)))
+
+            (begin
+
+                (if (pair? (car list))
+
+                    (set list (cdr list))
+
+                    (begin
+                    
+                        (if (= (car list) key)
+                        
+                            (set sum (+ sum 1))
+
+                            0
+
+                        )
+
+                        (set list (cdr list))
+                    
+                    )
+                )
+            )
+        )
+
+        (if (pair? (car list))
+
+                    (set list (cdr list))
+
+                    (begin
+                    
+                        (if (= (car list) key)
+                        
+                            (set sum (+ sum 1))
+
+                            0
+
+                        )
+
+                        (set list (cdr list))
+                    
+                    )
+                )
+
+        (println sum)
+
+    )
+)
+
+
+(count 'a '(a (a a a) a))
+(count 'a '(a b a c a))
+(count '1 '(1 2 3 4 1))
+
