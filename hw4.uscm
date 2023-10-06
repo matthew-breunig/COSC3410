@@ -102,34 +102,100 @@
 
 (val sum 0)
 
+(val bool 0)
+
+(val check 0)
+
+(define equal-length (l1 l2)
+
+    (begin 
+
+        (set check 0)
+        (set bool 0)
+
+        (while (= check 0)
+
+            (begin
+
+                (if (and (null? (cdr l1)) (null? (cdr l2)))
+
+                    (begin
+
+                        (set bool 1)
+                        (set check 1)
+
+                    )
+
+                    (if (null? (cdr l1))
+
+                        (set check 1)
+
+                        (if (null? (cdr l2))
+
+                            (set check 1)
+
+                            (begin
+
+                                (set l1 (cdr l1))
+                                (set l2 (cdr l2))
+
+                            )
+                        )
+                    )
+                )
+            )
+        )
+
+        (println bool)
+
+    )
+  )
+
+(equal-length '(1 2 3 1) '(2 3 3 4))
+(equal-length '(1 2 3) '(2 3 3 4))
+(equal-length '(1 2 3 1) '(2 3 3))
+(equal-length '(1 2) '(2 3))
+
 (define dot-product (l1 l2)
 
     (begin
     
         (set sum 0)
 
-        (while (not (null? (cdr l1)))
+        (if (= (equal-length l1 l2) 1)
 
             (begin
 
+                (while (not (null? (cdr l1)))
+
+                    (begin
+
+                        (set sum (+ sum (* (car l1) (car l2) )))
+
+                        (set l1 (cdr l1))
+
+                        (set l2 (cdr l2))
+
+                    )
+                )
+
                 (set sum (+ sum (* (car l1) (car l2) )))
 
-                (set l1 (cdr l1))
-
-                (set l2 (cdr l2))
-
             )
-        )
 
-        (set sum (+ sum (* (car l1) (car l2) )))
+            0
+
+        )
 
         (println sum)
 
     )
 )
 
-(dot-product '(1 2 3) '(2 3))
+(dot-product '(1 2 3) '(2 3 1))
 (dot-product '(1 2 3) '(2 3 4))
+(dot-product '(1 2 3) '(2 3))
+(dot-product '(1 2 3) '(2 3 8 9))
 
 (define count (key list)
 
@@ -190,4 +256,51 @@
 (count 'a '(a (a a a) a))
 (count 'a '(a b a c a))
 (count '1 '(1 2 3 4 1))
+(count '() '(1 2 3))
 
+(define countall (key list)
+
+    (begin
+    
+        (set sum 0)
+
+    )
+
+)
+
+(val mirror '())
+
+(define mirror (list) 
+
+    (being
+
+        (set mirror '())
+    
+        (while (not (null? (cdr list)))
+
+            (begin
+
+                (if (pair? (car list))
+
+                    (set list (cdr list))
+
+                    (begin
+                    
+                        (if (= (car list) key)
+                        
+                            (set sum (+ sum 1))
+
+                            0
+
+                        )
+
+                        (set list (cdr list))
+                    
+                    )
+                )
+            )
+        )
+    
+    )
+
+)
