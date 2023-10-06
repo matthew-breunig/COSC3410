@@ -265,7 +265,6 @@
         (set sum 0)
 
     )
-
 )
 
 (val mirror '())
@@ -300,7 +299,26 @@
                 )
             )
         )
-    
     )
-
 )
+
+(define postorder (t)
+	(if (tree-null? t)
+	'()
+	(append
+		( postorder (tree-left t) )
+	(append		
+		( postorder (tree-right t))
+		(cons	(tree-datum t) '() )))
+	))
+(postorder (tree-add 7 (tree-add 5 (tree-add 3 (tree-add 1 (tree-add 2 (tree-add 4 (tree-make-null))))))))
+
+(define inorder (t)
+    (if (tree-null? t) 
+    '()
+    (append 
+	(inorder (tree-left t))
+		(cons (tree-datum t)
+		(inorder (tree-right t))))))
+
+(inorder (tree-add 7 (tree-add 5 (tree-add 6 (tree-add 3 (tree-add 1 (tree-add 2 (tree-add 4 (tree-make-null)))))))))
