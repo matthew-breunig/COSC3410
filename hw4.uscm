@@ -31,6 +31,8 @@
 (path 12 (tree-add 12 (tree-add 11 (tree-add 15 (tree-add 9 (tree-add 8 (tree-add 2 (tree-add 1 (tree-add 5 (tree-add 3 (tree-add 7 (tree-make-null))))))))))))
 (path 2 (tree-add 12 (tree-add 11 (tree-add 15 (tree-add 9 (tree-add 8 (tree-add 2 (tree-add 1 (tree-add 5 (tree-add 3 (tree-add 7 (tree-make-null))))))))))))
 
+
+
 (val exploded '())
 
 (define explode-digits (n)
@@ -39,10 +41,12 @@
 
         (set exploded '())
 
-        (while (>= n 1)
+        (while (>= n 1)     ; running until the number isn't an integer
+
             (begin
                 
-                (set exploded (cons (mod n 10) exploded))
+                (set exploded (cons (mod n 10) exploded))   ; building a list using 'mod' to split the numbers
+
                 (set n (/ n 10))
 
             )
@@ -56,6 +60,8 @@
 (explode-digits 123456789)
 (explode-digits 2468)
 
+
+
 (val imploded 1)
 (val j 0)
 (val counter 1)
@@ -68,20 +74,26 @@
         (set j 0)
         (set counter 1)
 
-        (while (not (null? (cdr n)))
+        (while (not (null? (cdr n)))    ; goes through and concatenates atoms by doing iterative decimal math
+
             (begin
-                (set imploded (* imploded 10))
-                (set imploded (+ imploded (car n)))
-                (set n (cdr n))
-                (set j (+ j 1))
+
+                (set imploded (* imploded 10))      ; imploded will have another '1' at the start of the number due to decimal math completed
+
+                (set imploded (+ imploded (car n))) ; sum the numbers
+
+                (set n (cdr n))                     ; iterate to the next element
+
+                (set j (+ j 1))                     ; iterate a counter for later
 
             )
         )
 
-        (set imploded (* imploded 10))
+        (set imploded (* imploded 10))              ; need to catch the missed digit due to the while conditional
         (set imploded (+ imploded (car n)))
 
-        (while (> j -1)
+        (while (> j -1)                             ; determining what needs to be cut off of 'imploded'
+
             (begin
 
                 (set counter (* counter 10))
@@ -91,7 +103,8 @@
             )
         )
 
-        (set imploded (- imploded counter))
+        (set imploded (- imploded counter)) ; cutting of the initial '1' that 'imploded' was defined as
+
         (println imploded)
 
     )
@@ -100,20 +113,22 @@
 (implode-digits '(1 2 3 4))
 (implode-digits '(2 4 6 8))
 
+
+
 (val sum 0)
 
 (val bool 0)
 
 (val check 0)
 
-(define equal-length (l1 l2)
+(define equal-length (l1 l2)        ; Helper function to check if the lengths are equal
 
     (begin 
 
         (set check 0)
-        (set bool 0)
+        (set bool 0)        ; has a dummy bool value to use in the driver function
 
-        (while (= check 0)
+        (while (= check 0)  ; just checks each base case to find null cases and determine equivalence from that (basically using a cond)
 
             (begin
 
@@ -156,21 +171,23 @@
 (equal-length '(1 2 3 1) '(2 3 3))
 (equal-length '(1 2) '(2 3))
 
+
+
 (define dot-product (l1 l2)
 
     (begin
     
         (set sum 0)
 
-        (if (= (equal-length l1 l2) 1)
+        (if (= (equal-length l1 l2) 1)              ; checking to ensure the lists are equal in size
 
             (begin
 
-                (while (not (null? (cdr l1)))
+                (while (not (null? (cdr l1)))       ; checking to make sure the list is at least 1 index out
 
-                    (begin
+                    (begin                          ; if so, calculate the terms multiplied and add to the sum
 
-                        (set sum (+ sum (* (car l1) (car l2) )))
+                        (set sum (+ sum (* (car l1) (car l2) )))    
 
                         (set l1 (cdr l1))
 
@@ -179,7 +196,7 @@
                     )
                 )
 
-                (set sum (+ sum (* (car l1) (car l2) )))
+                (set sum (+ sum (* (car l1) (car l2) )))    ; need to account for the lost index due to ending the loop when the cdr is null
 
             )
 
@@ -197,23 +214,25 @@
 (dot-product '(1 2 3) '(2 3))
 (dot-product '(1 2 3) '(2 3 8 9))
 
+
+
 (define count (key list)
 
     (begin
 
         (set sum 0)
     
-        (while (not (null? (cdr list)))
+        (while (not (null? (cdr list)))     ; ensuring the list isn't 1 index from the end
 
             (begin
 
-                (if (pair? (car list))
+                (if (pair? (car list))      ; checking if the element is a sublist
 
-                    (set list (cdr list))
+                    (set list (cdr list))   ; if so, just skip it
 
                     (begin
                     
-                        (if (= (car list) key)
+                        (if (= (car list) key)  ; if not, check for the key and iterate if found
                         
                             (set sum (+ sum 1))
 
@@ -228,7 +247,7 @@
             )
         )
 
-        (if (pair? (car list))
+        (if (pair? (car list))      ; since the loop ends 1 index early, that needs to be recovered with 1 additional iteration
 
                     (set list (cdr list))
 
@@ -258,49 +277,7 @@
 (count '1 '(1 2 3 4 1))
 (count '() '(1 2 3))
 
-(define countall (key list)
 
-    (begin
-    
-        (set sum 0)
-
-    )
-)
-
-(val mirror '())
-
-(define mirror (list) 
-
-    (being
-
-        (set mirror '())
-    
-        (while (not (null? (cdr list)))
-
-            (begin
-
-                (if (pair? (car list))
-
-                    (set list (cdr list))
-
-                    (begin
-                    
-                        (if (= (car list) key)
-                        
-                            (set sum (+ sum 1))
-
-                            0
-
-                        )
-
-                        (set list (cdr list))
-                    
-                    )
-                )
-            )
-        )
-    )
-)
 
 (define postorder (t)
 	(if (tree-null? t)
@@ -313,6 +290,8 @@
 	))
 (postorder (tree-add 7 (tree-add 5 (tree-add 3 (tree-add 1 (tree-add 2 (tree-add 4 (tree-make-null))))))))
 
+
+
 (define inorder (t)
     (if (tree-null? t) 
     '()
@@ -322,3 +301,69 @@
 		(inorder (tree-right t))))))
 
 (inorder (tree-add 7 (tree-add 5 (tree-add 6 (tree-add 3 (tree-add 1 (tree-add 2 (tree-add 4 (tree-make-null)))))))))
+
+
+
+(define append-item (list item)     ; Helper function to build the list to get around an error I was getting (car applied to non-pair 3 in (car xs))
+
+    (if (null? list)                ; checking if it's null
+
+        (cons item '())             ; if so, cons'ing a null list on
+
+        (cons (car list) (append-item (cdr list) item)) ; if not, cons'ing the car with a recursive call to itself to keep building in reverse
+        
+    )
+)
+
+
+
+(define mirror (list)
+
+    (if (null? list)
+
+        '()
+
+        (if (pair? (car list))                                      ; checking for a sublist
+
+            (append-item (mirror (cdr list)) (mirror (car list)))   ; if so, need to further split each part, in reverse order
+
+            (append-item (mirror (cdr list)) (car list))            ; if not, the first element doesn't need to be split further
+            
+        )
+    )
+)
+
+(mirror '(1 2 3)) 
+(mirror '(1 (2 3) 4)) 
+
+
+
+(define flatten (list)
+
+    (if (null? list)
+
+        '()                                                     ; returning a null if null
+
+        (if (pair? (car list))                                  ; checking if it's a sublist
+
+            (append (flatten (car list)) (flatten (cdr list)))  ; if so, recursively calling itself to further split the list
+
+            (cons (car list) (flatten (cdr list)))              ; if not, constructing a new list of the atoms
+            
+        )
+    )
+)
+
+(flatten '(((1) 2) (3 (4 5))))
+(flatten '((((((((22)))))))))
+
+
+
+(define countall (key list)
+
+    (begin
+    
+        (set sum 0)
+
+    )
+)
