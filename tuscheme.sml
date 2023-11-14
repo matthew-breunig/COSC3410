@@ -4702,14 +4702,14 @@ fun typeof(LITERAL(v), Delta, Gamma) =
         val tau_e2 = typeof(e2, Delta, Gamma)
       in
         if eqType(tau_e1, booltype)
-        then tau_e2
+        then raise TypeError "This should return NIL"
         else raise TypeError "Invalid types in while expression"
       end
 
   | typeof(BEGIN (exprs), Delta, Gamma) =
 
       (case exprs of
-        [] => raise TypeError "This should return NIL???"
+        [] => raise TypeError "This should return NIL"
       | [e] => typeof(e, Delta, Gamma)
       | e :: rest =>
           let
