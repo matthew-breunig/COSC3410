@@ -1662,12 +1662,14 @@ fun typeof(LITERAL(v), Delta, Gamma) =
     | LITERAL(NIL)                 => FORALL(["'a"], listtype tvA)  
  | _ => raise TypeError "typeof error")
  | typeof(VAR(x), Delta, Gamma) = find (x , Gamma)
- |typeof(SET(x, e), Delta, Gamma) = let val tau_x = typeof x
-                                        val tau_e = typeof e
-                                    in if eqType (tau_x, tau_e) then tau_x
-                                      else 
-                                        raise TypeError ("Set variable" ^ x ^ "of type " ^ typeString tau_x ^
-                                                          "to value of type" ^ typeString tau_e)
+ | typeof(SET(x, e), Delta, Gamma) = 
+                let 
+                  val x1 = find(x, Gamma)
+                  val e1 = typeof(e, Delta, Gamma)
+                    in if eqType (x1, e1) then x1
+                         else 
+                          raise TypeError ("Set variable " ^ x ^ " of type " ^ typeString x1 ^
+                                                          " to value of type " ^ typeString e1)
                                       end 
  | typeof _ = raise TypeError "typeof"
 
