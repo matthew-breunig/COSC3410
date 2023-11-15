@@ -1,3 +1,10 @@
+(* COSC 3410 Project 7
+@author Matt Bruenig 
+@author Annaliese Winklosky
+Instructor Dennis Brylow
+TA-BOT:MAILTO annaliese.winklosky@marquette.edu matthew.breunig@marquette.edu
+*)
+
 (* tuscheme.sml S405a *)
 
 
@@ -1670,7 +1677,58 @@ fun typeof(LITERAL(v), Delta, Gamma) =
                          else 
                           raise TypeError ("Set variable " ^ x ^ " of type " ^ typeString x1 ^
                                                           " to value of type " ^ typeString e1)
-                                      end 
+                                                         end 
+ | typeof(WHILEX(e1, e2), Delta, Gamma) =
+      let
+        val tau_e1 = typeof(e1, Delta, Gamma)
+        val tau_e2 = typeof(e2, Delta, Gamma)
+      in
+        if eqType(tau_e1, booltype)
+        then unittype
+        else raise TypeError "While type does not match bool"
+      end
+   | typeof(IFX(e1, e2, e3), Delta, Gamma) =
+      let
+        val tau_e1 = typeof(e1, Delta, Gamma)
+        val tau_e2 = typeof(e2, Delta, Gamma)
+        val tau_e3 = typeof(e3, Delta, Gamma)
+      in
+        if eqType(tau_e1, booltype) andalso eqType(tau_e2, tau_e3)
+        then tau_e2
+        else raise TypeError "Invalid types in if expression"
+      end
+| typeof(BEGIN (exprs), Delta, Gamma) =
+
+      (case exprs of
+        [] => unittype
+      | [e] => typeof(e, Delta, Gamma)
+      | e :: rest =>
+          let
+            val _ = List.app (fn exp => 
+              if eqType(typeof(e, Delta, Gamma), typeof(exp, Delta, Gamma)) then ()
+              else raise TypeError "Mismatched types in begin expression"
+            ) rest
+          in
+            typeof(List.last rest, Delta, Gamma)
+          end
+      )
+ (*| typeof(LETX(LET, bs, e), Delta, Gamma) =  
+            (case lk 
+            of 
+              LET(bs, e) => 
+              let 
+              val t1 = typeof(bs, Delta, Gamma)
+              val t2 =typeof(e, Delta, Gamma)
+                 in
+                  if eqType(t1, t2)
+                  then e
+                  else raise TypeError "Let typing mistmatch"
+                end 
+            | _ => raise TypeError "let typing"
+            
+            
+            ) *)
+         
  | typeof _ = raise TypeError "typeof"
 
 
