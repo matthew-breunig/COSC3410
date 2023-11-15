@@ -1712,22 +1712,32 @@ fun typeof(LITERAL(v), Delta, Gamma) =
             typeof(List.last rest, Delta, Gamma)
           end
       )
- (*| typeof(LETX(LET, bs, e), Delta, Gamma) =  
-            (case lk 
-            of 
-              LET(bs, e) => 
-              let 
-              val t1 = typeof(bs, Delta, Gamma)
-              val t2 =typeof(e, Delta, Gamma)
+ | typeof(LETX(LET, bs, e), Delta, Gamma) =  
+              let
+               val (names, values) = ListPair.unzip bs 
+               val t2 = typeof(e, Delta, Gamma)
                  in
-                  if eqType(t1, t2)
-                  then e
+                  if List.all (fn t => eqType(t, t2)) 
+                  then t2
                   else raise TypeError "Let typing mistmatch"
                 end 
-            | _ => raise TypeError "let typing"
+
+ | typeof(LETX(LETSTAR, bs, e), Delta, Gamma) =  
+              let
+                fun typeofBinding((x, bindingExp), Delta, Gamma) = 
+                case bindingExp of
+                SOME_EXP => typeof(bindingExp, Delta, Gamma)
+               | NONE_EXP => raise TypeError "Uninitialized binding"
+
+               val bindingTypes = map (fn b => typeofBinding(b, Delta, Gamma)) bs 
+               val t2 = typeof(e, Delta, Gamma)
+                 in 
+                  if List.all (fn t => eqType(t, t2)) bindingTypes
+                  then t2
+                  else raise TypeError "Let typing mistmatch"
+                end            
             
             
-            ) *)
          
  | typeof _ = raise TypeError "typeof"
 
