@@ -1712,33 +1712,73 @@ fun typeof(LITERAL(v), Delta, Gamma) =
             typeof(List.last rest, Delta, Gamma)
           end
       )
- | typeof(LETX(LET, bs, e), Delta, Gamma) =  
-              let
-               val (names, values) = ListPair.unzip bs 
-               val t2 = typeof(e, Delta, Gamma)
-                 in
-                  if List.all (fn t => eqType(t, t2)) 
-                  then t2
-                  else raise TypeError "Let typing mistmatch"
-                end 
-
- | typeof(LETX(LETSTAR, bs, e), Delta, Gamma) =  
-              let
-                fun typeofBinding((x, bindingExp), Delta, Gamma) = 
-                case bindingExp of
-                SOME_EXP => typeof(bindingExp, Delta, Gamma)
-               | NONE_EXP => raise TypeError "Uninitialized binding"
-
-               val bindingTypes = map (fn b => typeofBinding(b, Delta, Gamma)) bs 
-               val t2 = typeof(e, Delta, Gamma)
+ | typeof(LETX(LET, bindings, e), Delta, Gamma) =  
+             let
+               val newBindings = map (fn (name, exp) => (name, typeof(exp, Delta, Gamma))) bindings
+               val extendedGamma = newBindings @ Gamma
+               val bodyType = typeof(e, Delta, extendedGamma)
                  in 
-                  if List.all (fn t => eqType(t, t2)) bindingTypes
-                  then t2
-                  else raise TypeError "Let typing mistmatch"
+                  bodyType
                 end            
             
-            
-         
+
+ | typeof(LETX(LETSTAR, bindings, e), Delta, Gamma) =  
+ let 
+  fun processBindings(bindings, env) = 
+    case bindings of 
+      [] => env
+      | (name, exp)::bs => 
+        let 
+          val tau = typeof(exp, Delta, env)
+          val newEnv = bind(name, tau, env)
+        in 
+          processBindings(bs, newEnv)
+        end 
+      val extendedGamma = processBindings(bindings, Gamma)
+      val bodyType = typeof(e, Delta, extendedGamma)
+    in 
+    bodyType
+    end
+  |typeof (APPLY(f,args), Delta, Gamma) = 
+    let val tau_f = typeof(f, Delta, Gamma)
+          val tau_args = map (fn arg => typeof(arg, Delta, Gamma)) args
+      in
+        (case tau_f of
+             FUNTY(param_types, return_type) =>
+                 if eqTypes(param_types, tau_args) then return_type
+                 else raise TypeError "Function applied to arguments of incorrect types inside FUNTY"
+            | FORALL(["'a'"], return_type) =>
+                let val test = instantiate(tau_f, tau_args, Delta)
+                in
+                raise TypeError ("Function applied to arguments of incorrect types" ^ typeString test)
+                end
+            | _ => raise TypeError ("Non-function value in application" ^ typeString tau_f)
+        )
+      end
+  |typeof(TYLAMBDA(alphas, e), Delta, Gamma) = 
+      let val extendedDelta = foldl (fn (a,env) => bind(a, TYPE, env)) Delta alphas      
+      in typeof(e, extendedDelta, Gamma)
+      end 
+ | typeof(LETRECX(bindings, e), Delta, Gamma) =
+   let val assumedGamma = foldl (fn (((name, ty), _), env) => bind(name, ty, env)) Gamma bindings
+          val bindingTypes = map (fn ((name, ty), exp) => (name, typeof(exp, Delta, assumedGamma))) bindings
+          val newGamma = bindingTypes @ Gamma
+      in typeof(e, Delta, newGamma)
+      end
+ | typeof(LAMBDA(formals, e), Delta, Gamma) = 
+  let
+        val (fnames, ftypes) = ListPair.unzip formals
+        val extendedGamma = foldl (fn ((name, ty), env) => bind(name, ty, env)) Gamma formals
+        val bodyType = typeof(e, Delta, extendedGamma)
+    in
+        FUNTY(ftypes, bodyType)
+    end
+ | typeof(TYAPPLY(e, actuals), Delta, Gamma) = 
+    let 
+      val eType = typeof(e, Delta, Gamma)
+      in 
+        instantiate(eType, actuals, Delta)
+      end
  | typeof _ = raise TypeError "typeof"
 
 
@@ -1756,6 +1796,31 @@ fun typdef(e, Delta, Gamma) =
        in (bind (x, tau, Gamma), typeString tau)
       end 
       | _ => raise TypeError "typdef" 
+  | VALREC (x, tau, LAMBDA(formals, body)) => 
+      let 
+        val assumedGamma = bind(x,tau,Gamma)
+        val bodyType = typeof(LAMBDA(formals, body), Delta, assumedGamma)
+        in 
+          if eqType(bodyType, tau) then 
+          (bind(x,tau,Gamma),typeString(tau))
+          else 
+          raise TypeError ("Body of VALREC does not match type")
+          end 
+  | VALREC(x, tau, e) => 
+    raise TypeError "Must use a Lambda"
+  | DEFINE(f, tau, (formals, body)) => 
+    let 
+      val funType = FUNTY(List.map #2formals, tau)
+      val (fnames, ftypes) = ListPair.unzip formals
+      val newGamma = bind(f, funType, Gamma)
+      val formalsEnv = mkEnv(fnames, ftypes)
+      val bodyType = typeof(body, Delta, newGamma <+> formalsEnv)
+      in 
+        if eqType(bodyType, tau) then 
+          (newGamma, typeString(funType))
+          else 
+            raise TypeError ("Function body does not match declared type")
+          end
   
 (* type declarations for consistency checking *)
 val _ = op eqKind  : kind      * kind      -> bool
